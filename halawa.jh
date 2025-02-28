@@ -1,0 +1,93 @@
+/**
+ * User entity representing customers.
+ */
+entity User {
+    name String required,
+    email String required unique,
+    password String required,
+    phone String,
+    address String,
+    createdAt Instant
+}
+
+/**
+ * Category entity for grouping products.
+ */
+entity Category {
+    name String required unique,
+    description String
+}
+
+/**
+ * Product entity with self-referencing relationship for sub-products.
+ */
+entity Product {
+    name String required,
+    description String,
+    price BigDecimal required,
+    stockQuantity Integer required,
+    createdAt Instant
+}
+
+/**
+ * Cart entity representing a user's shopping cart.
+ */
+entity Cart {
+    totalAmount BigDecimal
+}
+
+/**
+ * CartItem entity linking products to carts with quantity and price.
+ */
+entity CartItem {
+    quantity Integer required,
+    price BigDecimal required
+}
+
+/**
+ * Order entity for completed purchases.
+ */
+entity Order {
+    totalAmount BigDecimal required,
+    status OrderStatus required,
+    createdAt Instant
+}
+
+/**
+ * OrderItem entity linking products to orders with quantity and price.
+ */
+entity OrderItem {
+    quantity Integer required,
+    price BigDecimal required
+}
+
+/**
+ * Enumeration for order status.
+ */
+enum OrderStatus {
+    PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+}
+
+/**
+ * Relationships between entities.
+ */
+relationship OneToMany {
+    User{order} to Order{user},
+    User{cart} to Cart{user},
+    Category{product} to Product{category},
+    Product{subProduct} to Product{parentProduct},
+    Cart{cartItem} to CartItem{cart},
+    CartItem{product} to Product,
+    Order{orderItem} to OrderItem{order},
+    OrderItem{product} to Product
+}
+
+/**
+ * Service layer for business logic.
+ */
+service all with serviceClass
+
+/**
+ * Enable pagination for orders and products.
+ */
+paginate Order, Product with pagination
